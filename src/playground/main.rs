@@ -1,9 +1,23 @@
 use leptos::*;
 
-fn main() {
+use delivery::store_manager_client::StoreManagerClient;
+
+pub mod delivery {
+    tonic::include_proto!("delivery.protobuf");
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     console_error_panic_hook::set_once();
 
+    let mut client = StoreManagerClient::connect("http://[::1]:50051").await?;
+    let request = tonic::Request::new(HelloRequest {
+        name: "Tonic".into(),
+    });
+
     mount_to_body(|| view! { <App/> });
+
+    Ok(())
 }
 
 #[component]
