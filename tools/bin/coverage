@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Set the IFS (Internal Field Separator) to space
+IFS='/'
+# Use read to bash convert string to array
+read -ra strarr <<< "$1"
+IFS=' '
+
+# Output the array and its length
+len=${#strarr[@]}
+PKG="${strarr[len-1]}"
+
+bazel coverage "$1/src:lib_test"
+genhtml --no-branch-coverage -output genhtml "$(bazel info output_path)/k8-fastbuild/testlogs/$1/${PKG}_test/coverage.dat"
+xdg-open $RUST_CODE/genhtml/index.html

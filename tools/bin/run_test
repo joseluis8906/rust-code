@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Set the IFS (Internal Field Separator) to space
+IFS='/'
+# Use read to bash convert string to array
+read -ra strarr <<< "$1"
+IFS=' '
+
+len=${#strarr[@]}
+PKG="${strarr[len-1]}"
+
+bazel test $1/src:lib_test --test_filter=^$2
