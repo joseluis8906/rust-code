@@ -3,14 +3,25 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+#[cfg(feature = "ssr")]
+pub mod ssr {
+    use leptos::*;
+
+    use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
+    use tonic::transport::Channel;
+
+    pub fn client() -> Result<StoreManagerClient<Channel>, ServerFnError> {
+        use_context::<StoreManagerClient<Channel>>()
+            .ok_or_else(|| ServerFnError::ServerError("gRPC StoreManagerClient missing.".into()))
+    }
+}
+
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
     view! {
-
-
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href="/pkg/{{project-name}}.css"/>
@@ -39,32 +50,26 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    // Creates a reactive value to update the button
-    let (count, set_count) = create_signal(0);
-    let on_click = move |_| set_count.update(|count| *count += 1);
-
     view! {
         <h1>"Welcome to Leptos!"</h1>
-        <button on:click=on_click>"Click Me: " {count}</button>
         <BusyButton />
     }
 }
 
-#[cfg(feature = "ssr")]
-pub mod ssr {
-    use leptos::*;
+pub mod forms {
+    use serde::{Deserialize, Serialize};
 
-    use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
-    use tonic::transport::Channel;
-
-    pub fn client() -> Result<StoreManagerClient<Channel>, ServerFnError> {
-        use_context::<StoreManagerClient<Channel>>()
-            .ok_or_else(|| ServerFnError::ServerError("gRPC StoreManagerClient missing.".into()))
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct Store {
+        pub name: Option<String>,
+        pub country: Option<String>,
+        pub city: Option<String>,
+        pub address: Option<String>,
     }
 }
 
 #[server(RegistersAStore)]
-pub async fn registers_a_store() -> Result<(), ServerFnError> {
+pub async fn registers_a_store(form: forms::Store) -> Result<(), ServerFnError> {
     use self::ssr::*;
     use crate::pb::delivery::storemanager::RegistersAStoreRequest;
     use crate::pb::delivery::Store;
@@ -73,10 +78,10 @@ pub async fn registers_a_store() -> Result<(), ServerFnError> {
 
     let mut request = tonic::Request::new(RegistersAStoreRequest {
         store: Some(Store {
-            name: Some("Burger King Cabecera".to_string()),
-            country: Some("Colombia".to_string()),
-            city: Some("Bucaramanga".to_string()),
-            address: Some("Cra 33 # 22 - 18".to_string()),
+            name: form.name,
+            country: form.country,
+            city: form.city,
+            address: form.address,
             products: vec![],
         }),
     });
@@ -97,7 +102,13 @@ pub fn BusyButton() -> impl IntoView {
     view! {
         <button on:click=move |_| {
             spawn_local(async {
-                let _ = registers_a_store().await;
+                let store = forms::Store {
+                    name: Some("Burger King Cabecera".to_string()),
+                    country: Some("Colombia".to_string()),
+                    city: Some("Bucaramanga".to_string()),
+                    address: Some("Cra 33 # 22 - 18".to_string()),
+                };
+                let _ = registers_a_store(store).await;
             });
         }>
             "Registers A Store"

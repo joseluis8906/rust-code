@@ -1988,6 +1988,7 @@ dependencies = [
  "log",
  "prost",
  "prost-types",
+ "serde",
  "simple_logger",
  "thiserror",
  "tokio",
