@@ -1,1 +1,4 @@
 
+[submodule "proto/joseluis8906/protobuf"]
+	path = proto/joseluis8906/protobuf
+	url = git@github.com:joseluis8906/protobuf.git
