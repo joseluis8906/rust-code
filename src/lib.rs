@@ -3,8 +3,6 @@ pub mod components;
 pub mod error_template;
 #[cfg(feature = "ssr")]
 pub mod fileserv;
-pub mod forms;
-#[cfg(feature = "ssr")]
 pub mod pb;
 pub mod state;
 

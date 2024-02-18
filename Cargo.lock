@@ -1979,6 +1979,7 @@ name = "rust-code"
 version = "0.1.0"
 dependencies = [
  "axum 0.7.4",
+ "cfg-if",
  "console_error_panic_hook",
  "http 1.0.0",
  "leptos",
@@ -1987,6 +1988,7 @@ dependencies = [
  "leptos_router",
  "log",
  "prost",
+ "prost-build",
  "prost-types",
  "serde",
  "simple_logger",

@@ -7,6 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+cfg-if = "1.0.0"
 axum = { version = "0.7", features = ["http1", "json", "macros", "matched-path", "original-uri", "tokio", "tower-log", "tracing", "form", "query"], optional = true }
 console_error_panic_hook = "0.1.7"
 leptos = { version = "0.6.5", features = ["nightly"] }
@@ -117,4 +118,5 @@ lib-profile-release = "wasm-release"
 
 # tonic build dependencies
 [build-dependencies]
+prost-build = "0.12.3"
 tonic-build = { version = "0.11", features = ["prost"] }

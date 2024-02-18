@@ -4,18 +4,21 @@ use leptos_meta::*;
 use leptos_router::*;
 
 use crate::components::{Button, Card, Desktop, Img, SelectMenu, Text};
-use crate::forms;
 
-#[cfg(feature = "ssr")]
-pub mod ssr {
-    use leptos::*;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "ssr")] {
+        use crate::pb::delivery::storemanager::RegistersAStoreRequest;
+        use crate::pb::delivery::Store;
 
-    use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
-    use tonic::transport::Channel;
+        use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
+        use tonic::transport::Channel;
 
-    pub fn client() -> Result<StoreManagerClient<Channel>, ServerFnError> {
-        use_context::<StoreManagerClient<Channel>>()
-            .ok_or_else(|| ServerFnError::ServerError("gRPC StoreManagerClient missing.".into()))
+        pub fn client() -> Result<StoreManagerClient<Channel>, ServerFnError> {
+            use_context::<StoreManagerClient<Channel>>()
+                .ok_or_else(|| ServerFnError::ServerError("gRPC StoreManagerClient missing.".into()))
+        }
+    }else{
+        use crate::pb::delivery::Store;
     }
 }
 
@@ -61,22 +64,12 @@ fn HomePage() -> impl IntoView {
 }
 
 #[server(RegistersAStore)]
-pub async fn registers_a_store(form: forms::Store) -> Result<(), ServerFnError> {
-    use self::ssr::*;
-    use crate::pb::delivery::storemanager::RegistersAStoreRequest;
-    use crate::pb::delivery::Store;
-
+pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
     let mut client = client()?;
 
-    let mut request = tonic::Request::new(RegistersAStoreRequest {
-        store: Some(Store {
-            name: form.name,
-            country: form.country,
-            city: form.city,
-            address: form.address,
-            products: vec![],
-        }),
-    });
+    let req = RegistersAStoreRequest { store: Some(store) };
+
+    let mut request = tonic::Request::new(req);
 
     request
         .metadata_mut()
@@ -104,38 +97,43 @@ pub fn ProductForm() -> impl IntoView {
 
             <Text
                 label="Name"
-                input=move |ev| set_name(event_target_value(&ev))
-                value=name />
+                value=name
+                on_input=set_name />
 
             <SelectMenu
                 label="Country"
-                value=country
                 options=vec!["Colombia"]
-                change=set_country />
+                value=country
+                on_change=set_country />
 
             <SelectMenu
                 label="City"
                 options=vec!["Bogota", "Bucaramanga", "Medellin"]
                 value=city
-                change=set_city/>
+                on_change=set_city />
 
             <Text
                 label="Address"
-                input=move |ev| set_address(event_target_value(&ev))
-                value=address />
+                value=address
+                on_input=set_address />
 
             <Button
                 label="Registers A Store"
-                click=move |_| {
-                    let store = forms::Store {
+                on_click=move |_| {
+                    let store = Store {
                         name: Some(name().to_string()),
                         country: Some(country().to_string()),
                         city: Some(city().to_string()),
                         address: Some(address().to_string()),
+                        products: vec![],
                     };
 
                     spawn_local(async move {
-                        let _ = registers_a_store(store).await;
+                        let res = registers_a_store(store).await;
+                        match res {
+                            Ok(_) => logging::log!("store registered successfully!"),
+                            Err(e) => logging::error!("registering store: {:?}", e),
+                        }
                     });
                 }
             />

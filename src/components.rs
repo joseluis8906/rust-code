@@ -1,5 +1,4 @@
 use leptos::*;
-use wasm_bindgen::JsValue;
 
 #[component]
 pub fn Desktop(children: Children) -> impl IntoView {
@@ -20,22 +19,20 @@ pub fn Card(children: Children) -> impl IntoView {
 }
 
 #[component]
-pub fn Text<T, U>(
+pub fn Text(
     #[prop(default = "Input Text")] label: &'static str,
-    input: T,
-    value: ReadSignal<U>,
-) -> impl IntoView
-where
-    T: FnMut(leptos::ev::Event) + 'static,
-    U: std::fmt::Display + 'static + Clone,
-    JsValue: From<U>,
-{
+    on_input: WriteSignal<String>,
+    value: ReadSignal<String>,
+) -> impl IntoView {
     view! {
         <input
             class="bg-neutral-800 text-neutral-200 placeholder-neutral-500 rounded-lg shadow-inner shadow-neutral-900 focus:outline focus:outline-2 focus:outline-cyan-600/50 py-1.5 pl-3"
             type="text"
             placeholder=label
-            on:input=input
+            on:input=move |ev| {
+                let val = event_target_value(&ev);
+                on_input(val);
+            }
             prop:value=value />
     }
 }
@@ -64,14 +61,14 @@ pub fn Label(children: Children) -> impl IntoView {
 }
 
 #[component]
-pub fn Button<T>(label: &'static str, click: T) -> impl IntoView
+pub fn Button<T>(label: &'static str, on_click: T) -> impl IntoView
 where
     T: FnMut(leptos::ev::MouseEvent) + 'static,
 {
     view! {
         <button
             class="bg-cyan-600/50 text-neutral-200 rounded-lg shadow-md shadow-neutral-900 hover:bg-cyan-600/75 active:bg-cyan-600/50 p-2"
-            on:click=click
+            on:click=on_click
         >
             {label}
         </button>
@@ -79,15 +76,12 @@ where
 }
 
 #[component]
-pub fn SelectMenu<T>(
+pub fn SelectMenu(
     #[prop(optional)] label: &'static str,
-    value: ReadSignal<String>,
     options: Vec<&'static str>,
-    mut change: T,
-) -> impl IntoView
-where
-    T: FnMut(String) + 'static + Copy,
-{
+    on_change: WriteSignal<String>,
+    value: ReadSignal<String>,
+) -> impl IntoView {
     let (hidden, set_hidden) = create_signal(true);
 
     view! {
@@ -133,7 +127,7 @@ where
                     role="option"
                     on:click=move |_| {
                         set_hidden(true);
-                        change("".to_string())
+                        on_change("".to_string())
                     }
 
                 >
@@ -157,7 +151,7 @@ where
                                 role="option"
                                 on:click=move |_| {
                                     set_hidden(true);
-                                    change(op.to_string())
+                                    on_change(op.to_string())
                                 }
 
                             >

@@ -3,3 +3,5 @@
 bazel-*
 **/dist
 node_modules
+src/pb/tonicpb/*.rs
+src/pb/prostpb/*.rs
