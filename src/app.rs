@@ -3,6 +3,9 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+use crate::components::{Button, Card, Desktop, Img, SelectMenu, Text};
+use crate::forms;
+
 #[cfg(feature = "ssr")]
 pub mod ssr {
     use leptos::*;
@@ -24,7 +27,7 @@ pub fn App() -> impl IntoView {
     view! {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/{{project-name}}.css"/>
+        <Stylesheet id="leptos" href="/pkg/playground.css"/>
 
         // sets the document title
         <Title text="Welcome to Leptos"/>
@@ -39,9 +42,11 @@ pub fn App() -> impl IntoView {
             .into_view()
         }>
             <main>
-                <Routes>
-                    <Route path="" view=HomePage/>
-                </Routes>
+                <Desktop>
+                    <Routes>
+                        <Route path="" view=HomePage/>
+                    </Routes>
+                </Desktop>
             </main>
         </Router>
     }
@@ -51,20 +56,7 @@ pub fn App() -> impl IntoView {
 #[component]
 fn HomePage() -> impl IntoView {
     view! {
-        <h1>"Welcome to Leptos!"</h1>
-        <BusyButton />
-    }
-}
-
-pub mod forms {
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Debug, Serialize, Deserialize, Clone)]
-    pub struct Store {
-        pub name: Option<String>,
-        pub country: Option<String>,
-        pub city: Option<String>,
-        pub address: Option<String>,
+        <ProductForm />
     }
 }
 
@@ -98,20 +90,63 @@ pub async fn registers_a_store(form: forms::Store) -> Result<(), ServerFnError> 
 }
 
 #[component]
-pub fn BusyButton() -> impl IntoView {
+pub fn ProductForm() -> impl IntoView {
+    let (name, set_name) = create_signal("".to_string());
+    let (country, set_country) = create_signal("".to_string());
+    let (city, set_city) = create_signal("".to_string());
+    let (address, set_address) = create_signal("".to_string());
+
     view! {
-        <button on:click=move |_| {
-            spawn_local(async {
-                let store = forms::Store {
-                    name: Some("Burger King Cabecera".to_string()),
-                    country: Some("Colombia".to_string()),
-                    city: Some("Bucaramanga".to_string()),
-                    address: Some("Cra 33 # 22 - 18".to_string()),
-                };
-                let _ = registers_a_store(store).await;
-            });
-        }>
-            "Registers A Store"
-        </button>
+        <Card>
+            <Img
+                src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
+                alt="store"/>
+
+            <Text
+                label="Name"
+                input=move |ev| set_name(event_target_value(&ev))
+                value=name />
+
+            <SelectMenu
+                // searchable
+                label="Search a country..."
+                options=vec!["Argentina", "Colombia", "United States"]
+                value=country
+                change=move |ev| {
+                    let new_value = event_target_value(&ev);
+                    set_country(new_value);
+                }/>
+
+            <SelectMenu
+                // searchable
+                label="Search a city..."
+                options=vec!["Bogota", "Medellin", "Bucaramanga"]
+                value=city
+                change=move |ev| {
+                    let new_value = event_target_value(&ev);
+                    set_city(new_value);
+                }/>
+
+            <Text
+                label="Address"
+                input=move |ev| set_address(event_target_value(&ev))
+                value=address />
+
+            <Button
+                label="Registers A Store"
+                click=move |_| {
+                    let store = forms::Store {
+                        name: Some(name().to_string()),
+                        country: Some(country().to_string()),
+                        city: Some(city().to_string()),
+                        address: Some(address().to_string()),
+                    };
+
+                    spawn_local(async move {
+                        let _ = registers_a_store(store).await;
+                    });
+                }
+            />
+        </Card>
     }
 }

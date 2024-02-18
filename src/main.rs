@@ -55,6 +55,8 @@ async fn leptos_routes_handler(
 async fn main() {
     simple_logger::init_with_level(log::Level::Info).expect("couldn't initialize logging");
 
+    log::info!("running server with SSR");
+
     use rust_code::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
 
     let client = StoreManagerClient::connect("http://[::1]:50051")
