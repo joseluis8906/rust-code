@@ -108,24 +108,16 @@ pub fn ProductForm() -> impl IntoView {
                 value=name />
 
             <SelectMenu
-                // searchable
-                label="Search a country..."
-                options=vec!["Argentina", "Colombia", "United States"]
+                label="Country"
                 value=country
-                change=move |ev| {
-                    let new_value = event_target_value(&ev);
-                    set_country(new_value);
-                }/>
+                options=vec!["Colombia"]
+                change=set_country />
 
             <SelectMenu
-                // searchable
-                label="Search a city..."
-                options=vec!["Bogota", "Medellin", "Bucaramanga"]
+                label="City"
+                options=vec!["Bogota", "Bucaramanga", "Medellin"]
                 value=city
-                change=move |ev| {
-                    let new_value = event_target_value(&ev);
-                    set_city(new_value);
-                }/>
+                change=set_city/>
 
             <Text
                 label="Address"
@@ -147,6 +139,7 @@ pub fn ProductForm() -> impl IntoView {
                     });
                 }
             />
+
         </Card>
     }
 }
