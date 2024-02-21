@@ -4,7 +4,13 @@ module.exports = {
     files: ["*.html", "./src/**/*.rs"],
   },
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        background: '#242424',
+        foreground: '#323232',
+        hover: '#3c3c3c',
+      },
+    },
   },
   plugins: [],
 }

@@ -3,7 +3,7 @@ use leptos::*;
 #[component]
 pub fn Desktop(children: Children) -> impl IntoView {
     view! {
-        <div class="conainer mx-auto p-4 h-screen flex items-center justify-center desktop">
+        <div class="conainer mx-auto p-1 sm:p-2 md:p-4 w-screen h-screen flex items-center justify-center desktop">
             {children()}
         </div>
     }
@@ -12,7 +12,10 @@ pub fn Desktop(children: Children) -> impl IntoView {
 #[component]
 pub fn Card(children: Children) -> impl IntoView {
     view! {
-        <div class="card bg-neutral-700 shadow-md shadow-gray-800 mx-auto rounded-lg grid gap-2 grid-cols-1 p-3">
+        <div
+            class="w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-md shadow-gray-900 mx-auto rounded-lg grid gap-5 \
+                    grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64"
+        >
             {children()}
         </div>
     }
@@ -25,15 +28,27 @@ pub fn Text(
     value: ReadSignal<String>,
 ) -> impl IntoView {
     view! {
-        <input
-            class="bg-neutral-800 text-neutral-200 placeholder-neutral-500 rounded-lg shadow-inner shadow-neutral-900 focus:outline focus:outline-2 focus:outline-cyan-600/50 py-1.5 pl-3"
-            type="text"
-            placeholder=label
-            on:input=move |ev| {
-                let val = event_target_value(&ev);
-                on_input(val);
-            }
-            prop:value=value />
+        <div class="relative">
+            <input
+                id="floating_filled"
+                class="block bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
+                        active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 pt-5 pb-2.5 px-3 \
+                        mt-1 w-full appearance-none peer"
+                type="text"
+                placeholder=" "
+                on:input=move |ev| {
+                    let val = event_target_value(&ev);
+                    on_input(val);
+                }
+                prop:value=value
+            />
+
+            <label for="floating_filled" class="absolute text-md text-neutral-400 duration-300 transform -translate-y-4 \
+                    scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-neutral-200 peer-placeholder-shown:scale-100 \
+                    peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 \
+                    rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto"
+            >{label}</label>
+        </div>
     }
 }
 
@@ -47,7 +62,7 @@ pub fn Img(
 ) -> impl IntoView {
     view! {
         <img
-            class="rounded-lg shadow-inner shadow-neutral-900"
+            class="rounded-lg"
             src=src
             alt=alt />
     }

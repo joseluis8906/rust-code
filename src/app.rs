@@ -91,9 +91,9 @@ pub fn ProductForm() -> impl IntoView {
 
     view! {
         <Card>
-            <Img
-                src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
-                alt="store"/>
+            // <Img
+            //     src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
+            //     alt="store"/>
 
             <Text
                 label="Name"

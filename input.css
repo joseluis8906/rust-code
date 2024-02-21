@@ -8,11 +8,3 @@
   background: linear-gradient(to top, #3A6073, #16222A); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-.card {
-  width: 256;
-}
-
-img {
-  height: 64 px;
-}
-
