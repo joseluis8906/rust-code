@@ -3,7 +3,9 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
-use crate::components::{Button, Card, Desktop, Img, SelectMenu, Text};
+use crate::components::{
+    Button, Card, Desktop, ListBox, ListBoxRow, SearchEntry, SelectMenu, Text,
+};
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
@@ -99,6 +101,13 @@ pub fn ProductForm() -> impl IntoView {
                 label="Name"
                 value=name
                 on_input=set_name />
+
+
+            <SearchEntry />
+
+            <ListBox>
+                <ListBoxRow />
+            </ListBox>
 
             <SelectMenu
                 label="Country"

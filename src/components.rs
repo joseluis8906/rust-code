@@ -191,3 +191,285 @@ pub fn SelectMenu(
         </div>
     }
 }
+
+#[component]
+pub fn StatusPage() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ToastOverlay() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Banner() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Avatar() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Dialog() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn AlertDialog() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn AboutDialog() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ActionRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn SwitchRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ComboRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ExpanderRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn EntryRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn PasswordEntryRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn SpinRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn PreferenceGroup() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn PreferencePage() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn PreferenceDialog() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn NavigationView() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn NavigationSplitView() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn OverlaySplitView() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Carousel() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ViewSwitcher() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ViewSwitcherBar() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn TabBar() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn TabOverview() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn TabButton() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Clamp() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ToolbarView() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn WindowTitle() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn HeaderBar() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Window() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn SplitButton() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ButtonContent() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn Bin() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn ListBox(children: Children) -> impl IntoView {
+    view! {
+        <div>
+            {children()}
+        </div>
+    }
+}
+
+#[component]
+pub fn ListBoxRow() -> impl IntoView {
+    view! {}
+}
+
+#[component]
+pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> impl IntoView {
+    let (value, set_value) = create_signal("".to_string());
+    let (length, set_length) = create_signal(0);
+
+    create_effect(move |_| {
+        set_length(value().len());
+    });
+
+    view! {
+        <form class="max-w-md mx-auto">
+            <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+            <div class="relative">
+                <button class="absolute inset-y-0 start-0 flex items-center ps-3 text-gray-400 hover:text-gray-200">
+                    <Icon class="w-4 h-4 text-neutral-400 hover:text-neutral-200" name="search-loop" />
+                </button>
+                <input
+                    type="search"
+                    id="default-search"
+                    class="block w-full p-2 ps-10 text-sm bg-foreground text-neutral-200 placeholder-neutral-500 \
+                        rounded-lg hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 \
+                        focus:ring-blue-300/50 w-full"
+                    placeholder=placeholder
+                    on:input=move |ev| set_value(event_target_value(&ev))
+                    prop:value=value
+                />
+                <button
+                    type="button"
+                    class="absolute end-2 bottom-2.5 bg-transparent focus:outline-none font-medium rounded-lg text-sm p-0"
+                    class:hidden=move || length() == 0
+                    on:click=move |_| set_value("".to_string())
+                >
+                    <Icon name="backspace" />
+                </button>
+            </div>
+        </form>
+    }
+}
+
+#[component]
+pub fn Icon(
+    name: &'static str,
+    #[prop(default = "w-4 h-4 text-neutral-200")] class: &'static str,
+) -> impl IntoView {
+    let xmlns = "http://www.w3.org/2000/svg";
+
+    view! {
+            {
+                match name {
+                    "backspace" => {
+                        view! {
+                            <svg
+                                class=class
+                                xmlns=xmlns
+                                fill="currentColor"
+                                stroke="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
+                            </svg>
+                        }
+                    },
+                    "search-loop" => {
+                        view! {
+                            <svg
+                                class=class
+                                xmlns=xmlns
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                                />
+                            </svg>
+                        }
+                    },
+                    _ => {
+                        view!{
+                            <svg
+                                class=class
+                                xmlns=xmlns
+                                fill="none"
+                                stroke="none"
+                                viewBox="0 0 20 20"
+                            >
+                                <path></path>
+                            </svg>
+                        }
+                    },
+                }
+            }
+    }
+}
