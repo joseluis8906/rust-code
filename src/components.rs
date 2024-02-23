@@ -1,3 +1,4 @@
+use bson::oid::ObjectId;
 use leptos::*;
 
 #[component]
@@ -13,8 +14,9 @@ pub fn Desktop(children: Children) -> impl IntoView {
 pub fn Card(children: Children) -> impl IntoView {
     view! {
         <div
-            class="w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-md shadow-gray-900 mx-auto rounded-lg grid gap-5 \
-                    grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64"
+            class="w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-lg shadow-gray-800 mx-auto rounded-lg grid gap-5 \
+                grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64 border-zinc-50/10 \
+                border"
         >
             {children()}
         </div>
@@ -27,10 +29,12 @@ pub fn Text(
     on_input: WriteSignal<String>,
     value: ReadSignal<String>,
 ) -> impl IntoView {
+    let id = format!("floating-filledr{}", ObjectId::new());
+
     view! {
         <div class="relative">
             <input
-                id="floating_filled"
+                id=id.to_owned()
                 class="block bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
                         active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 pt-5 pb-2.5 px-3 \
                         mt-1 w-full appearance-none peer"
@@ -43,7 +47,7 @@ pub fn Text(
                 prop:value=value
             />
 
-            <label for="floating_filled" class="absolute text-md text-neutral-400 duration-300 transform -translate-y-4 \
+            <label for=id class="absolute text-md text-neutral-400 duration-300 transform -translate-y-4 \
                     scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-neutral-200 peer-placeholder-shown:scale-100 \
                     peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 \
                     rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto"
@@ -106,8 +110,6 @@ pub fn SelectMenu(
                 on:click=move|_| set_hidden(!hidden())
             >
                 <span class="flex items-center">
-                    // <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" class="h-5 w-5 flex-shrink-0 rounded-full" />
-                    // <span class="ml-3 block truncate">Tom Cook</span>
                     <span
                         class="block truncate"
                         class=("text-neutral-500", move || {value().to_string().is_empty()})
@@ -228,8 +230,20 @@ pub fn AboutDialog() -> impl IntoView {
 }
 
 #[component]
-pub fn ActionRow() -> impl IntoView {
-    view! {}
+pub fn ActionRow(
+    #[prop(optional)] title: &'static str,
+    #[prop(optional)] subtitle: &'static str,
+) -> impl IntoView {
+    view! {
+        <div
+            class="block bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
+                active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 \
+                w-full appearance-none"
+        >
+            <label class="block text-md text-nutral-200">{title}</label>
+            <span class="text-xs text-neutral-400">{subtitle}</span>
+        </div>
+    }
 }
 
 #[component]
@@ -248,8 +262,49 @@ pub fn ExpanderRow() -> impl IntoView {
 }
 
 #[component]
-pub fn EntryRow() -> impl IntoView {
-    view! {}
+pub fn EntryRow(
+    #[prop(default = "Input Text")] label: &'static str,
+    on_input: WriteSignal<String>,
+    value: ReadSignal<String>,
+) -> impl IntoView {
+    let (hidden, set_hidden) = create_signal(false);
+    let id = format!("floating-filled-{}", ObjectId::new());
+
+    view! {
+        <div class="relative">
+            <input
+                id=id.to_owned()
+                class="block bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
+                        active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 pt-5 pb-2.5 px-3 \
+                        w-full appearance-none peer"
+                type="text"
+                placeholder=" "
+                on:input=move |ev| {
+                    let val = event_target_value(&ev);
+                    on_input(val);
+                }
+                on:focus=move |_| set_hidden(true)
+                on:blur=move |_| set_hidden(false)
+                prop:value=value
+            />
+
+            <label for=id class="absolute text-md text-neutral-400 duration-300 transform -translate-y-4 \
+                    scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-neutral-200 peer-placeholder-shown:scale-100 \
+                    peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 \
+                    rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto"
+            >
+                {label}
+            </label>
+
+            <button
+                type="button"
+                class="absolute end-2 bottom-5 bg-transparent text-neutral-200 focus:outline-none p-0"
+                class:hidden=hidden
+            >
+                <Icon name="edit"/>
+            </button>
+        </div>
+    }
 }
 
 #[component]
@@ -385,16 +440,18 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
         set_length(value().len());
     });
 
+    let id = format!("default-search-{}", ObjectId::new());
+
     view! {
         <form class="max-w-md mx-auto">
-            <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+            <label for=id.to_owned() class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
             <div class="relative">
                 <button class="absolute inset-y-0 start-0 flex items-center ps-3 text-gray-400 hover:text-gray-200">
                     <Icon class="w-4 h-4 text-neutral-400 hover:text-neutral-200" name="search-loop" />
                 </button>
                 <input
                     type="search"
-                    id="default-search"
+                    id=id
                     class="block w-full p-2 ps-10 text-sm bg-foreground text-neutral-200 placeholder-neutral-500 \
                         rounded-lg hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 \
                         focus:ring-blue-300/50 w-full"
@@ -404,7 +461,7 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
                 />
                 <button
                     type="button"
-                    class="absolute end-2 bottom-2.5 bg-transparent focus:outline-none font-medium rounded-lg text-sm p-0"
+                    class="absolute end-2 bottom-2.5 bg-transparent focus:outline-none p-0"
                     class:hidden=move || length() == 0
                     on:click=move |_| set_value("".to_string())
                 >
@@ -422,54 +479,68 @@ pub fn Icon(
 ) -> impl IntoView {
     let xmlns = "http://www.w3.org/2000/svg";
 
-    view! {
-            {
-                match name {
-                    "backspace" => {
-                        view! {
-                            <svg
-                                class=class
-                                xmlns=xmlns
-                                fill="currentColor"
-                                stroke="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
-                            </svg>
-                        }
-                    },
-                    "search-loop" => {
-                        view! {
-                            <svg
-                                class=class
-                                xmlns=xmlns
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                                />
-                            </svg>
-                        }
-                    },
-                    _ => {
-                        view!{
-                            <svg
-                                class=class
-                                xmlns=xmlns
-                                fill="none"
-                                stroke="none"
-                                viewBox="0 0 20 20"
-                            >
-                                <path></path>
-                            </svg>
-                        }
-                    },
+    {
+        match name {
+            "backspace" => {
+                view! {
+                    <svg
+                        class=class
+                        xmlns=xmlns
+                        fill="currentColor"
+                        stroke="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
+                    </svg>
                 }
             }
+            "search-loop" => {
+                view! {
+                    <svg
+                        class=class
+                        xmlns=xmlns
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                        />
+                    </svg>
+                }
+            }
+            "edit" => {
+                view! {
+                    <svg
+                        class=class
+                        xmlns=xmlns
+                        fill="currentColor"
+                        stroke="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                    </svg>
+
+                }
+            }
+            _ => {
+                view! {
+                    <svg
+                        class=class
+                        xmlns=xmlns
+                        fill="none"
+                        stroke="none"
+                        viewBox="0 0 20 20"
+                    >
+                        <path></path>
+                    </svg>
+                }
+            }
+        }
     }
 }

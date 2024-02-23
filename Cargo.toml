@@ -22,11 +22,12 @@ thiserror = "1"
 tracing = { version = "0.1", optional = true }
 http = "1"
 prost = "0.12"
-prost-types = "0.12.3"
+prost-types = {version = "0.12.3"}
 tonic = { version = "0.11", optional = true }
-simple_logger = "4.3.3"
-log = "0.4.20"
-serde = "1.0.196"
+simple_logger = {version = "4.3.3", optional = true}
+log = {version = "0.4.20", optional = true}
+serde = { version = "1.0.196" }
+bson = { version = "2.9.0" }
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
@@ -40,7 +41,9 @@ ssr = [
     "leptos_meta/ssr",
     "leptos_router/ssr",
     "dep:tracing",
-    "tonic"
+    "dep:tonic",
+    "dep:simple_logger",
+    "dep:log",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

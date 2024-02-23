@@ -4,7 +4,14 @@ use leptos_meta::*;
 use leptos_router::*;
 
 use crate::components::{
-    Button, Card, Desktop, ListBox, ListBoxRow, SearchEntry, SelectMenu, Text,
+    ActionRow,
+    Button,
+    Card,
+    Desktop,
+    EntryRow,
+    ListBox,
+    ListBoxRow,
+    SearchEntry, //SelectMenu,
 };
 
 cfg_if::cfg_if! {
@@ -97,7 +104,7 @@ pub fn ProductForm() -> impl IntoView {
             //     src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
             //     alt="store"/>
 
-            <Text
+            <EntryRow
                 label="Name"
                 value=name
                 on_input=set_name />
@@ -105,23 +112,25 @@ pub fn ProductForm() -> impl IntoView {
 
             <SearchEntry />
 
-            <ListBox>
-                <ListBoxRow />
-            </ListBox>
+            <ActionRow title="Country" subtitle="Chose a country from list..." />
 
-            <SelectMenu
-                label="Country"
-                options=vec!["Colombia"]
-                value=country
-                on_change=set_country />
+            // <ListBox>
+            //     <ListBoxRow />
+            // </ListBox>
 
-            <SelectMenu
-                label="City"
-                options=vec!["Bogota", "Bucaramanga", "Medellin"]
-                value=city
-                on_change=set_city />
+            // <SelectMenu
+            //     label="Country"
+            //     options=vec!["Colombia"]
+            //     value=country
+            //     on_change=set_country />
 
-            <Text
+            // <SelectMenu
+            //     label="City"
+            //     options=vec!["Bogota", "Bucaramanga", "Medellin"]
+            //     value=city
+            //     on_change=set_city />
+
+            <EntryRow
                 label="Address"
                 value=address
                 on_input=set_address />
