@@ -6,8 +6,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        osd: '#171717',
         background: '#242424',
-        foreground: '#323232',
+        foreground: '#333333',
         hover: '#3c3c3c',
       },
     },

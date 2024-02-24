@@ -10,52 +10,6 @@ pub fn Desktop(children: Children) -> impl IntoView {
     }
 }
 
-#[component]
-pub fn Card(children: Children) -> impl IntoView {
-    view! {
-        <div
-            class="w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-lg shadow-gray-800 mx-auto rounded-lg grid gap-5 \
-                grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64 border-zinc-50/10 \
-                border"
-        >
-            {children()}
-        </div>
-    }
-}
-
-#[component]
-pub fn Text(
-    #[prop(default = "Input Text")] label: &'static str,
-    on_input: WriteSignal<String>,
-    value: ReadSignal<String>,
-) -> impl IntoView {
-    let id = format!("floating-filledr{}", ObjectId::new());
-
-    view! {
-        <div class="relative">
-            <input
-                id=id.to_owned()
-                class="block bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
-                        active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 pt-5 pb-2.5 px-3 \
-                        mt-1 w-full appearance-none peer"
-                type="text"
-                placeholder=" "
-                on:input=move |ev| {
-                    let val = event_target_value(&ev);
-                    on_input(val);
-                }
-                prop:value=value
-            />
-
-            <label for=id class="absolute text-md text-neutral-400 duration-300 transform -translate-y-4 \
-                    scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-neutral-200 peer-placeholder-shown:scale-100 \
-                    peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 \
-                    rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto"
-            >{label}</label>
-        </div>
-    }
-}
-
 const DEFAULT_SRC: &str = "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=1060";
 const DEFAULT_ALT: &str = "default image";
 
@@ -215,8 +169,14 @@ pub fn Avatar() -> impl IntoView {
 }
 
 #[component]
-pub fn Dialog() -> impl IntoView {
-    view! {}
+pub fn Dialog(children: Children) -> impl IntoView {
+    view! {
+        <div class="absolute w-full h-full bg-osd/50 top-0 left-0 z-50 rounded-lg flex items-center justify-center">
+            <div class="min-w-56 h-min bg-osd shadow-lg shadow-neutral-900 mx-auto rounded-lg border-zinc-50/10 border">
+                {children()}
+            </div>
+        </div>
+    }
 }
 
 #[component]
@@ -233,15 +193,32 @@ pub fn AboutDialog() -> impl IntoView {
 pub fn ActionRow(
     #[prop(optional)] title: &'static str,
     #[prop(optional)] subtitle: &'static str,
+    #[prop(default = "angle-right")] icon: &'static str,
 ) -> impl IntoView {
+    let (value, _set_value) = create_signal("".to_string());
+
     view! {
         <div
-            class="block bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
+            class="flex relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
                 active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 \
                 w-full appearance-none"
         >
-            <label class="block text-md text-nutral-200">{title}</label>
+            <label
+                class="text-md text-neutral-400"
+                class=("block ", !subtitle.is_empty())
+                class=("inline-block py-3", subtitle.is_empty())
+                class=("text-nutral-200", move || !value().is_empty())
+            >
+                {title}
+            </label>
             <span class="text-xs text-neutral-400">{subtitle}</span>
+            <span>{value}</span>
+            <button
+                type="button"
+                class="absolute inset-y-0 end-2 bg-transparent focus:outline-none p-0"
+            >
+                <Icon name=icon />
+            </button>
         </div>
     }
 }
@@ -388,18 +365,41 @@ pub fn ToolbarView() -> impl IntoView {
 }
 
 #[component]
-pub fn WindowTitle() -> impl IntoView {
-    view! {}
+pub fn WindowTitle(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
+    view! {
+        <div
+            class=""
+            class=class
+        >
+            {children()}
+        </div>
+    }
 }
 
 #[component]
-pub fn HeaderBar() -> impl IntoView {
-    view! {}
+pub fn HeaderBar(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
+    view! {
+        <div
+            class="bg-foreground w-full rounded-t-lg"
+            class=class
+        >
+            {children()}
+        </div>
+    }
 }
 
 #[component]
-pub fn Window() -> impl IntoView {
-    view! {}
+pub fn Window(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
+    view! {
+        <div
+            class="w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-lg shadow-neutral-800 mx-auto rounded-lg grid gap-5 \
+                grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64 border-zinc-50/10 \
+                border"
+            class=class
+        >
+            {children()}
+        </div>
+    }
 }
 
 #[component]
@@ -420,15 +420,23 @@ pub fn Bin() -> impl IntoView {
 #[component]
 pub fn ListBox(children: Children) -> impl IntoView {
     view! {
-        <div>
+        <div class="max-h-64 overflow-auto scroll-smoth">
             {children()}
         </div>
     }
 }
 
 #[component]
-pub fn ListBoxRow() -> impl IntoView {
-    view! {}
+pub fn ListBoxRow(
+    #[prop(optional)] title: &'static str,
+    #[prop(optional)] subtitle: &'static str,
+) -> impl IntoView {
+    view! {
+        <div>
+            {title}
+            {subtitle}
+        </div>
+    }
 }
 
 #[component]
@@ -524,6 +532,25 @@ pub fn Icon(
                         <path
                             d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
                         />
+                    </svg>
+
+                }
+            }
+            "angle-right" => {
+                view! {
+                    <svg
+                        class=class
+                        xmlns=xmlns
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="3"
+                            d="m9 5 7 7-7 7" />
+
                     </svg>
 
                 }

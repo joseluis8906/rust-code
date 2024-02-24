@@ -4,14 +4,8 @@ use leptos_meta::*;
 use leptos_router::*;
 
 use crate::components::{
-    ActionRow,
-    Button,
-    Card,
-    Desktop,
-    EntryRow,
-    ListBox,
-    ListBoxRow,
-    SearchEntry, //SelectMenu,
+    ActionRow, Button, Desktop, Dialog, EntryRow, HeaderBar, ListBox, ListBoxRow, SearchEntry,
+    Window,
 };
 
 cfg_if::cfg_if! {
@@ -94,12 +88,12 @@ pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
 #[component]
 pub fn ProductForm() -> impl IntoView {
     let (name, set_name) = create_signal("".to_string());
-    let (country, set_country) = create_signal("".to_string());
-    let (city, set_city) = create_signal("".to_string());
+    let (country, _set_country) = create_signal("".to_string());
+    let (city, _set_city) = create_signal("".to_string());
     let (address, set_address) = create_signal("".to_string());
 
     view! {
-        <Card>
+        <Window class="relative">
             // <Img
             //     src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
             //     alt="store"/>
@@ -109,26 +103,40 @@ pub fn ProductForm() -> impl IntoView {
                 value=name
                 on_input=set_name />
 
+            <Dialog>
+                <HeaderBar>Select A City</HeaderBar>
+                <ListBox>
+                    <ListBoxRow title="Row One"/>
+                    <ListBoxRow title="Row Two"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                    <ListBoxRow title="Row Three"/>
+                </ListBox>
+            </Dialog>
 
             <SearchEntry />
 
-            <ActionRow title="Country" subtitle="Chose a country from list..." />
-
-            // <ListBox>
-            //     <ListBoxRow />
-            // </ListBox>
-
-            // <SelectMenu
-            //     label="Country"
-            //     options=vec!["Colombia"]
-            //     value=country
-            //     on_change=set_country />
-
-            // <SelectMenu
-            //     label="City"
-            //     options=vec!["Bogota", "Bucaramanga", "Medellin"]
-            //     value=city
-            //     on_change=set_city />
+            <ActionRow
+                title="Country"
+                // subtitle="Chose a country from list..."
+            />
 
             <EntryRow
                 label="Address"
@@ -155,7 +163,6 @@ pub fn ProductForm() -> impl IntoView {
                     });
                 }
             />
-
-        </Card>
+        </Window>
     }
 }
