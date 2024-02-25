@@ -4,9 +4,11 @@ use leptos_meta::*;
 use leptos_router::*;
 
 use crate::components::{
-    ActionRow, Button, Desktop, Dialog, EntryRow, HeaderBar, ListBox, ListBoxRow, SearchEntry,
-    Window,
+    Button, CityActionRow, Desktop, Dialog, EntryRow, HeaderBar, ListBox, ListBoxRow, SearchEntry,
+    Window, WindowContent, WindowTitle,
 };
+
+use crate::types;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
@@ -88,81 +90,125 @@ pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
 #[component]
 pub fn ProductForm() -> impl IntoView {
     let (name, set_name) = create_signal("".to_string());
-    let (country, _set_country) = create_signal("".to_string());
-    let (city, _set_city) = create_signal("".to_string());
+    // let (country, _set_country) = create_signal("".to_string());
+    let (city, set_city) = create_signal(types::CityCountry {
+        city: "",
+        country: "",
+    });
     let (address, set_address) = create_signal("".to_string());
+    let (show_dialog, set_show_dialog) = create_signal(false);
 
     view! {
-        <Window class="relative">
-            // <Img
-            //     src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
-            //     alt="store"/>
+        <Window>
+            <WindowTitle>Register a Store</WindowTitle>
+            <WindowContent>
+                // <Img
+                //     src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
+                //     alt="store"/>
 
-            <EntryRow
-                label="Name"
-                value=name
-                on_input=set_name />
+                <EntryRow
+                    label="Name"
+                    value=name
+                    on_input=move |ev| set_name(event_target_value(&ev))
+                />
 
-            <Dialog>
-                <HeaderBar>Select A City</HeaderBar>
-                <ListBox>
-                    <ListBoxRow title="Row One"/>
-                    <ListBoxRow title="Row Two"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                    <ListBoxRow title="Row Three"/>
-                </ListBox>
-            </Dialog>
+                <Dialog show=show_dialog>
+                    <HeaderBar class="bg-osd" title="Select a City">
+                        <SearchEntry />
+                    </HeaderBar>
+                    <ListBox>
+                        <ListBoxRow
+                            on_click=move |_| {
+                                set_city(types::CityCountry {
+                                    city: "Bucaramanga",
+                                    country: "Colombia",
+                                });
+                                set_show_dialog(false);
+                            }
+                        >
+                            <div class="flex items-center">
+                                <div class="leading-tight">
+                                    <span class="block">Bucaramanga, <b>Colombia</b></span>
+                                    <span class="text-xs text-neutral-300">America/Bogota {"·"} UTC-0500</span>
+                                </div>
+                                <div class="grow text-sm text-right text-neutral-300">
+                                    <span>Fri 16:56</span>
+                                </div>
+                            </div>
+                        </ListBoxRow>
+                        <ListBoxRow
+                            on_click=move |_| {
+                                set_city(types::CityCountry {
+                                    city: "Buenos Aires",
+                                    country: "Argentina",
+                                });
+                                set_show_dialog(false);
+                            }
+                        >
+                            <div class="flex items-center">
+                                <div class="leading-tight">
+                                    <span class="block">Buenos Aires, <b>Argentina</b></span>
+                                    <span class="text-xs text-neutral-300">America/Buenos Aires {"·"} UTC-0400</span>
+                                </div>
+                                <div class="grow text-sm text-right text-neutral-300">
+                                    <span>Fri 15:56</span>
+                                </div>
+                            </div>
+                        </ListBoxRow>
+                    </ListBox>
+                </Dialog>
 
-            <SearchEntry />
+                <CityActionRow
+                    title="City"
+                    // subtitle="Chose a city from list..."
+                    value=city
+                    on_click=move |_| {
+                        set_show_dialog(true);
+                    }
+                />
 
-            <ActionRow
-                title="Country"
-                // subtitle="Chose a country from list..."
-            />
+                <EntryRow
+                    label="Address"
+                    value=address
+                    on_input=move |ev| set_address(event_target_value(&ev))
+                />
 
-            <EntryRow
-                label="Address"
-                value=address
-                on_input=set_address />
-
-            <Button
-                label="Registers A Store"
-                on_click=move |_| {
-                    let store = Store {
-                        name: Some(name().to_string()),
-                        country: Some(country().to_string()),
-                        city: Some(city().to_string()),
-                        address: Some(address().to_string()),
-                        products: vec![],
-                    };
-
-                    spawn_local(async move {
-                        let res = registers_a_store(store).await;
-                        match res {
-                            Ok(_) => logging::log!("store registered successfully!"),
-                            Err(e) => logging::error!("registering store: {:?}", e),
+                <div class="flex justify-between">
+                    <Button
+                        label="Cancel"
+                        on_click=move |_| {
+                            logging::log!("cancel clicked");
                         }
-                    });
-                }
-            />
+                    />
+
+                    <Button
+                        label="Save"
+                        primary=true
+                        on_click=move |_| {
+                            let city = city();
+
+                            let store = Store {
+                                name: Some(name().to_string()),
+                                country: Some(city.country.to_string()),
+                                city: Some(city.city.to_string()),
+                                address: Some(address().to_string()),
+                                products: vec![],
+                            };
+
+                            logging::log!("store={:?}", store);
+                            // spawn_local(async move {
+                            //     let res = registers_a_store(store).await;
+                            //     match res {
+                            //         Ok(_) => logging::log!("store registered successfully!"),
+                            //         Err(e) => logging::error!("registering store: {:?}", e),
+                            //     }
+                            // });
+                        }
+                    />
+                </div>
+
+            </WindowContent>
+
         </Window>
     }
 }

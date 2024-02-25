@@ -1,6 +1,8 @@
 use bson::oid::ObjectId;
 use leptos::*;
 
+use crate::types;
+
 #[component]
 pub fn Desktop(children: Children) -> impl IntoView {
     view! {
@@ -34,13 +36,24 @@ pub fn Label(children: Children) -> impl IntoView {
 }
 
 #[component]
-pub fn Button<T>(label: &'static str, on_click: T) -> impl IntoView
+pub fn Button<T>(
+    label: &'static str,
+    on_click: T,
+    #[prop(default = false)] primary: bool,
+) -> impl IntoView
 where
     T: FnMut(leptos::ev::MouseEvent) + 'static,
 {
     view! {
         <button
-            class="bg-cyan-600/50 text-neutral-200 rounded-lg shadow-md shadow-neutral-900 hover:bg-cyan-600/75 active:bg-cyan-600/50 p-2"
+            class="min-w-24 w-fit text-neutral-200 shadow-none rounded-lg shadow-md \
+                shadow-neutral-900  py-2 px-6"
+            class=("bg-primary-500", move || primary)
+            class=("hover:bg-primary-550", move || primary)
+            class=("active:bg-primary-600", move || primary)
+            class=("bg-foreground", move || !primary)
+            class=("hover:bg-hover", move || !primary)
+            class=("active:bg-active", move || !primary)
             on:click=on_click
         >
             {label}
@@ -169,10 +182,13 @@ pub fn Avatar() -> impl IntoView {
 }
 
 #[component]
-pub fn Dialog(children: Children) -> impl IntoView {
+pub fn Dialog(show: ReadSignal<bool>, children: Children) -> impl IntoView {
     view! {
-        <div class="absolute w-full h-full bg-osd/50 top-0 left-0 z-50 rounded-lg flex items-center justify-center">
-            <div class="min-w-56 h-min bg-osd shadow-lg shadow-neutral-900 mx-auto rounded-lg border-zinc-50/10 border">
+        <div
+            class="absolute w-full h-full bg-osd/50 top-0 left-0 z-50 rounded-lg flex items-center justify-center"
+            class:hidden=move || !show()
+        >
+            <div class="min-w-80 min-h-80 h-min bg-osd shadow-lg shadow-neutral-900 mx-auto rounded-lg border-zinc-50/10 border">
                 {children()}
             </div>
         </div>
@@ -190,29 +206,55 @@ pub fn AboutDialog() -> impl IntoView {
 }
 
 #[component]
-pub fn ActionRow(
+pub fn CityActionRow<T: FnMut(leptos::ev::MouseEvent) + 'static>(
+    on_click: T,
+    value: ReadSignal<types::CityCountry>,
     #[prop(optional)] title: &'static str,
     #[prop(optional)] subtitle: &'static str,
     #[prop(default = "angle-right")] icon: &'static str,
 ) -> impl IntoView {
-    let (value, _set_value) = create_signal("".to_string());
+    let (city, set_city) = create_signal("".to_string());
+    let (country, set_country) = create_signal("".to_string());
+
+    create_effect(move |_| {
+        let city = value().city.to_string();
+        let country = value().country.to_string();
+
+        set_city(city);
+        set_country(country);
+    });
 
     view! {
         <div
-            class="flex relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg hover:bg-hover \
-                active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 \
-                w-full appearance-none"
+            class="flex items-center relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg \
+            hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 w-full \
+            appearance-none"
+            on:click=on_click
         >
-            <label
-                class="text-md text-neutral-400"
-                class=("block ", !subtitle.is_empty())
-                class=("inline-block py-3", subtitle.is_empty())
-                class=("text-nutral-200", move || !value().is_empty())
+            <div class="mr-3">
+                <label
+                    class="text-md"
+                    class=("text-neutral-200", move || !city().is_empty() && !country().is_empty())
+                    class=("text-neutral-400", move || city().is_empty() || country().is_empty())
+                    class=("block", move || !subtitle.is_empty())
+                    class=("inline-block", move || subtitle.is_empty())
+                    class=("py-3",move || subtitle.is_empty() || (!city().is_empty() && !country().is_empty()))
+                >
+                    {title}
+                </label>
+                <span
+                    class="text-xs text-neutral-400"
+                    class:hidden=move || subtitle.is_empty() || (!city().is_empty() && !country().is_empty())
+                >
+                    {subtitle}
+                </span>
+            </div>
+            <div
+                class="grow text-right pr-4"
+                class:hidden=move || city().is_empty() || country().is_empty()
             >
-                {title}
-            </label>
-            <span class="text-xs text-neutral-400">{subtitle}</span>
-            <span>{value}</span>
+                <span>{city}</span>, <strong>{country}</strong>
+            </div>
             <button
                 type="button"
                 class="absolute inset-y-0 end-2 bg-transparent focus:outline-none p-0"
@@ -239,9 +281,9 @@ pub fn ExpanderRow() -> impl IntoView {
 }
 
 #[component]
-pub fn EntryRow(
+pub fn EntryRow<T: FnMut(leptos::ev::Event) + 'static>(
     #[prop(default = "Input Text")] label: &'static str,
-    on_input: WriteSignal<String>,
+    on_input: T,
     value: ReadSignal<String>,
 ) -> impl IntoView {
     let (hidden, set_hidden) = create_signal(false);
@@ -256,10 +298,7 @@ pub fn EntryRow(
                         w-full appearance-none peer"
                 type="text"
                 placeholder=" "
-                on:input=move |ev| {
-                    let val = event_target_value(&ev);
-                    on_input(val);
-                }
+                on:input=on_input
                 on:focus=move |_| set_hidden(true)
                 on:blur=move |_| set_hidden(false)
                 prop:value=value
@@ -368,8 +407,37 @@ pub fn ToolbarView() -> impl IntoView {
 pub fn WindowTitle(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     view! {
         <div
-            class=""
+            class="text-md text-neutral-200 text-center pt-3"
             class=class
+        >
+            <strong>{children()}</strong>
+        </div>
+    }
+}
+
+#[component]
+pub fn HeaderBar(
+    #[prop(optional)] title: &'static str,
+    #[prop(optional)] class: &'static str,
+    children: Children,
+) -> impl IntoView {
+    view! {
+        <div
+            class="bg-foreground w-full rounded-t-lg flex grid gap-2 p-3"
+            class=class
+        >
+            <strong class="text-neutral-200 text-center">{title}</strong>
+            {children()}
+        </div>
+    }
+}
+
+#[component]
+pub fn Window(children: Children) -> impl IntoView {
+    view! {
+        <div
+            class="relative w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-xl shadow-black/50 mx-auto rounded-lg \
+                border-zinc-50/10 border p-0"
         >
             {children()}
         </div>
@@ -377,26 +445,9 @@ pub fn WindowTitle(#[prop(optional)] class: &'static str, children: Children) ->
 }
 
 #[component]
-pub fn HeaderBar(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
+pub fn WindowContent(children: Children) -> impl IntoView {
     view! {
-        <div
-            class="bg-foreground w-full rounded-t-lg"
-            class=class
-        >
-            {children()}
-        </div>
-    }
-}
-
-#[component]
-pub fn Window(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
-    view! {
-        <div
-            class="w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-lg shadow-neutral-800 mx-auto rounded-lg grid gap-5 \
-                grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64 border-zinc-50/10 \
-                border"
-            class=class
-        >
+        <div class="grid gap-5 grid-cols-1 py-4 sm:py-8 lg:py-16 px-4 sm:px-16 lg:px-32 xl:px-48 2xl:px-64">
             {children()}
         </div>
     }
@@ -427,14 +478,16 @@ pub fn ListBox(children: Children) -> impl IntoView {
 }
 
 #[component]
-pub fn ListBoxRow(
-    #[prop(optional)] title: &'static str,
-    #[prop(optional)] subtitle: &'static str,
+pub fn ListBoxRow<T: FnMut(leptos::ev::MouseEvent) + 'static>(
+    on_click: T,
+    children: Children,
 ) -> impl IntoView {
     view! {
-        <div>
-            {title}
-            {subtitle}
+        <div
+            class="min-h-12 text-neutral-200 hover:bg-background p-2 border-b last:border-none border-zinc-50/10"
+            on:click=on_click
+        >
+            {children()}
         </div>
     }
 }
