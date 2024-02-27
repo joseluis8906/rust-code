@@ -504,7 +504,7 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
     let id = format!("default-search-{}", ObjectId::new());
 
     view! {
-        <form class="max-w-md mx-auto">
+        <div class="max-w-md mx-auto">
             <label for=id.to_owned() class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
             <div class="relative">
                 <button class="absolute inset-y-0 start-0 flex items-center ps-3 text-gray-400 hover:text-gray-200">
@@ -529,7 +529,7 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
                     <Icon name="backspace" />
                 </button>
             </div>
-        </form>
+        </div>
     }
 }
 

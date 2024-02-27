@@ -90,7 +90,6 @@ pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
 #[component]
 pub fn ProductForm() -> impl IntoView {
     let (name, set_name) = create_signal("".to_string());
-    // let (country, _set_country) = create_signal("".to_string());
     let (city, set_city) = create_signal(types::CityCountry {
         city: "",
         country: "",
@@ -160,7 +159,7 @@ pub fn ProductForm() -> impl IntoView {
 
                 <CityActionRow
                     title="City"
-                    // subtitle="Chose a city from list..."
+                    subtitle="Chose a city from list..."
                     value=city
                     on_click=move |_| {
                         set_show_dialog(true);
@@ -177,7 +176,12 @@ pub fn ProductForm() -> impl IntoView {
                     <Button
                         label="Cancel"
                         on_click=move |_| {
-                            logging::log!("cancel clicked");
+                            set_name("".to_string());
+                            set_city(types::CityCountry {
+                                city: "",
+                                country: "",
+                            });
+                            set_address("".to_string());
                         }
                     />
 
@@ -195,14 +199,13 @@ pub fn ProductForm() -> impl IntoView {
                                 products: vec![],
                             };
 
-                            logging::log!("store={:?}", store);
-                            // spawn_local(async move {
-                            //     let res = registers_a_store(store).await;
-                            //     match res {
-                            //         Ok(_) => logging::log!("store registered successfully!"),
-                            //         Err(e) => logging::error!("registering store: {:?}", e),
-                            //     }
-                            // });
+                            spawn_local(async move {
+                                let res = registers_a_store(store).await;
+                                match res {
+                                    Ok(_) => logging::log!("store registered successfully!"),
+                                    Err(e) => logging::error!("registering store: {:?}", e),
+                                }
+                            });
                         }
                     />
                 </div>
