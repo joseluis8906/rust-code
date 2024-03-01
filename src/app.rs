@@ -80,11 +80,11 @@ pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
         .metadata_mut()
         .insert("x-auth-email", "john.doe@example.com".parse().unwrap());
 
-    let response = client.registers_a_store(request).await.unwrap();
-
-    println!("RESPONSE={:?}", response);
-
-    Ok(())
+    let response = client.registers_a_store(request).await;
+    match response {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ServerFnError::ServerError(e.to_string())),
+    }
 }
 
 #[component]
@@ -96,6 +96,15 @@ pub fn ProductForm() -> impl IntoView {
     });
     let (address, set_address) = create_signal("".to_string());
     let (show_dialog, set_show_dialog) = create_signal(false);
+
+    let reset = move || {
+        set_name("".to_string());
+        set_city(types::CityCountry {
+            city: "",
+            country: "",
+        });
+        set_address("".to_string());
+    };
 
     view! {
         <Window>
@@ -175,15 +184,8 @@ pub fn ProductForm() -> impl IntoView {
                 <div class="flex justify-between">
                     <Button
                         label="Cancel"
-                        on_click=move |_| {
-                            set_name("".to_string());
-                            set_city(types::CityCountry {
-                                city: "",
-                                country: "",
-                            });
-                            set_address("".to_string());
-                        }
-                    />
+                        on_click=move |_| reset()
+                />
 
                     <Button
                         label="Save"
@@ -202,8 +204,11 @@ pub fn ProductForm() -> impl IntoView {
                             spawn_local(async move {
                                 let res = registers_a_store(store).await;
                                 match res {
-                                    Ok(_) => logging::log!("store registered successfully!"),
-                                    Err(e) => logging::error!("registering store: {:?}", e),
+                                    Ok(_) => {
+                                            logging::log!("store registered successfully!");
+                                            reset()
+                                        },
+                                    Err(e) => logging::error!("{:?}", e),
                                 }
                             });
                         }
