@@ -28,6 +28,7 @@ simple_logger = {version = "4.3.3", optional = true}
 log = {version = "0.4.20", optional = true}
 serde = { version = "1.0.196" }
 bson = { version = "2.9.0" }
+leptos-use = "0.10.4"
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
@@ -40,6 +41,7 @@ ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
+    "leptos-use/ssr",
     "dep:tracing",
     "dep:tonic",
     "dep:simple_logger",

@@ -1,6 +1,8 @@
 use bson::oid::ObjectId;
 use leptos::*;
+use leptos_use::{use_intl_number_format, NumberStyle, UseIntlNumberFormatOptions};
 
+use crate::pb::delivery::{Money, Product, Store};
 use crate::types;
 
 #[component]
@@ -46,8 +48,7 @@ where
 {
     view! {
         <button
-            class="min-w-24 w-fit text-neutral-200 shadow-none rounded-lg shadow-md \
-                shadow-neutral-900  py-2 px-6"
+            class="min-w-24 w-fit text-neutral-200 shadow-none rounded-lg shadow-md shadow-neutral-900 py-2 px-6"
             class=("bg-primary-500", move || primary)
             class=("hover:bg-primary-550", move || primary)
             class=("active:bg-primary-600", move || primary)
@@ -116,7 +117,6 @@ pub fn SelectMenu(
 
                 >
                     <div class="flex items-center">
-                        // <img src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" class="h-5 w-5 flex-shrink-0 rounded-full" />
                         <span class="text-neutral-500 font-normal ml-3 block truncate">Select a/an {label}...</span>
                     </div>
 
@@ -209,10 +209,12 @@ pub fn AboutDialog() -> impl IntoView {
 pub fn CityActionRow<T: FnMut(leptos::ev::MouseEvent) + 'static>(
     on_click: T,
     value: ReadSignal<types::CityCountry>,
-    #[prop(optional)] title: &'static str,
-    #[prop(optional)] subtitle: &'static str,
-    #[prop(default = "angle-right")] icon: &'static str,
+    #[prop(optional)] title: String,
+    #[prop(optional)] subtitle: String,
+    #[prop(default = "angle-right".to_string())] icon: String,
 ) -> impl IntoView {
+    let (title, _) = create_signal(title);
+    let (subtitle, _) = create_signal(subtitle);
     let (city, set_city) = create_signal("".to_string());
     let (country, set_country) = create_signal("".to_string());
 
@@ -224,6 +226,13 @@ pub fn CityActionRow<T: FnMut(leptos::ev::MouseEvent) + 'static>(
         set_country(country);
     });
 
+    let is_city_not_empty = move || !city().is_empty() && !country().is_empty();
+    let is_city_empty = move || city().is_empty() || country().is_empty();
+    let is_subtitle_not_empty = move || !subtitle().is_empty();
+    let is_subtitle_empty = move || subtitle().is_empty();
+    let is_subtitle_empty_and_city_not =
+        move || subtitle().is_empty() || (!city().is_empty() && !country().is_empty());
+
     view! {
         <div
             class="flex items-center relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg \
@@ -234,17 +243,17 @@ pub fn CityActionRow<T: FnMut(leptos::ev::MouseEvent) + 'static>(
             <div class="mr-3">
                 <label
                     class="text-md"
-                    class=("text-neutral-200", move || !city().is_empty() && !country().is_empty())
-                    class=("text-neutral-400", move || city().is_empty() || country().is_empty())
-                    class=("block", move || !subtitle.is_empty())
-                    class=("inline-block", move || subtitle.is_empty())
-                    class=("py-3",move || subtitle.is_empty() || (!city().is_empty() && !country().is_empty()))
+                    class=("text-neutral-200", is_city_not_empty)
+                    class=("text-neutral-400", is_city_empty)
+                    class=("block", is_subtitle_not_empty)
+                    class=("inline-block", is_subtitle_empty)
+                    class=("py-3", is_subtitle_empty_and_city_not)
                 >
                     {title}
                 </label>
                 <span
                     class="text-xs text-neutral-400"
-                    class:hidden=move || subtitle.is_empty() || (!city().is_empty() && !country().is_empty())
+                    class:hidden=is_subtitle_empty_and_city_not
                 >
                     {subtitle}
                 </span>
@@ -282,7 +291,7 @@ pub fn ExpanderRow() -> impl IntoView {
 
 #[component]
 pub fn EntryRow<T: FnMut(leptos::ev::Event) + 'static>(
-    #[prop(default = "Input Text")] label: &'static str,
+    #[prop(default = "Input Text".to_string())] label: String,
     on_input: T,
     value: ReadSignal<String>,
 ) -> impl IntoView {
@@ -317,7 +326,7 @@ pub fn EntryRow<T: FnMut(leptos::ev::Event) + 'static>(
                 class="absolute end-2 bottom-5 bg-transparent text-neutral-200 focus:outline-none p-0"
                 class:hidden=hidden
             >
-                <Icon name="edit"/>
+                <Icon name="edit".to_string() />
             </button>
         </div>
     }
@@ -349,8 +358,28 @@ pub fn PreferenceDialog() -> impl IntoView {
 }
 
 #[component]
-pub fn NavigationView() -> impl IntoView {
-    view! {}
+pub fn NavigationView(children: Children) -> impl IntoView {
+    view! {
+        <div class="">
+            {children()}
+        </div>
+    }
+}
+
+#[component]
+pub fn NavigationPage(
+    #[prop(default = "Page".to_string())] title: String,
+    children: Children,
+) -> impl IntoView {
+    view! {
+        <div class="flex items-center">
+            <div class="px-3"><Icon name="angle-left".to_string() /></div>
+            <WindowTitle class="w-full".to_string()>{title}</WindowTitle>
+        </div>
+        <WindowContent>
+            {children()}
+        </WindowContent>
+    }
 }
 
 #[component]
@@ -404,10 +433,10 @@ pub fn ToolbarView() -> impl IntoView {
 }
 
 #[component]
-pub fn WindowTitle(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
+pub fn WindowTitle(#[prop(optional)] class: String, children: Children) -> impl IntoView {
     view! {
         <div
-            class="text-md text-neutral-200 text-center pt-3"
+            class="text-md text-neutral-200 text-center py-3"
             class=class
         >
             <strong>{children()}</strong>
@@ -417,8 +446,8 @@ pub fn WindowTitle(#[prop(optional)] class: &'static str, children: Children) ->
 
 #[component]
 pub fn HeaderBar(
-    #[prop(optional)] title: &'static str,
-    #[prop(optional)] class: &'static str,
+    #[prop(optional)] title: String,
+    #[prop(optional)] class: String,
     children: Children,
 ) -> impl IntoView {
     view! {
@@ -436,7 +465,7 @@ pub fn HeaderBar(
 pub fn Window(children: Children) -> impl IntoView {
     view! {
         <div
-            class="relative w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-xl shadow-black/50 mx-auto rounded-lg \
+            class="relative min-w-80 w-11/12 sm:w-10/12 md:w-3/5 bg-background shadow-xl shadow-black/50 mx-auto rounded-lg \
                 border-zinc-50/10 border p-0"
         >
             {children()}
@@ -493,7 +522,7 @@ pub fn ListBoxRow<T: FnMut(leptos::ev::MouseEvent) + 'static>(
 }
 
 #[component]
-pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> impl IntoView {
+pub fn SearchEntry(#[prop(default = "Search".to_string())] placeholder: String) -> impl IntoView {
     let (value, set_value) = create_signal("".to_string());
     let (length, set_length) = create_signal(0);
 
@@ -508,7 +537,7 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
             <label for=id.to_owned() class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
             <div class="relative">
                 <button class="absolute inset-y-0 start-0 flex items-center ps-3 text-gray-400 hover:text-gray-200">
-                    <Icon class="w-4 h-4 text-neutral-400 hover:text-neutral-200" name="search-loop" />
+                    <Icon class="w-4 h-4 text-neutral-400 hover:text-neutral-200".to_string() name="search-loop".to_string() />
                 </button>
                 <input
                     type="search"
@@ -526,7 +555,7 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
                     class:hidden=move || length() == 0
                     on:click=move |_| set_value("".to_string())
                 >
-                    <Icon name="backspace" />
+                    <Icon name="backspace".to_string() />
                 </button>
             </div>
         </div>
@@ -534,18 +563,16 @@ pub fn SearchEntry(#[prop(default = "Search")] placeholder: &'static str) -> imp
 }
 
 #[component]
-pub fn Icon(
-    name: &'static str,
-    #[prop(default = "w-4 h-4 text-neutral-200")] class: &'static str,
-) -> impl IntoView {
+pub fn Icon(name: String, #[prop(optional)] class: String) -> impl IntoView {
     let xmlns = "http://www.w3.org/2000/svg";
+    let default_class = format!("w-4 h-4 text-neutral-200 {}", class);
 
     {
-        match name {
+        match name.as_str() {
             "backspace" => {
                 view! {
                     <svg
-                        class=class
+                        class=default_class
                         xmlns=xmlns
                         fill="currentColor"
                         stroke="none"
@@ -558,7 +585,7 @@ pub fn Icon(
             "search-loop" => {
                 view! {
                     <svg
-                        class=class
+                        class=default_class
                         xmlns=xmlns
                         fill="none"
                         stroke="currentColor"
@@ -576,7 +603,7 @@ pub fn Icon(
             "edit" => {
                 view! {
                     <svg
-                        class=class
+                        class=default_class
                         xmlns=xmlns
                         fill="currentColor"
                         stroke="none"
@@ -592,7 +619,7 @@ pub fn Icon(
             "angle-right" => {
                 view! {
                     <svg
-                        class=class
+                        class=default_class
                         xmlns=xmlns
                         fill="none"
                         stroke="currentColor"
@@ -608,10 +635,28 @@ pub fn Icon(
 
                 }
             }
+            "angle-left" => {
+                view! {
+                    <svg
+                        class=default_class
+                        xmlns=xmlns
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="3"
+                            d="m15 19-7-7 7-7" />
+                    </svg>
+
+                }
+            }
             _ => {
                 view! {
                     <svg
-                        class=class
+                        class=default_class
                         xmlns=xmlns
                         fill="none"
                         stroke="none"
@@ -622,5 +667,161 @@ pub fn Icon(
                 }
             }
         }
+    }
+}
+
+#[component]
+pub fn StoreActionRow<T>(value: ReadSignal<Store>, on_click: T) -> impl IntoView
+where
+    T: FnMut(leptos::ev::MouseEvent) + 'static,
+{
+    let (city, set_city) = create_signal("".to_string());
+    let (country, set_country) = create_signal("".to_string());
+    let (name, set_name) = create_signal("".to_string());
+    let (address, set_address) = create_signal("".to_string());
+
+    create_effect(move |_| {
+        let city = value().city.unwrap_or("".to_string()).to_string();
+        let country = value().country.unwrap_or("".to_string()).to_string();
+        let name = value().name.unwrap_or("".to_string()).to_string();
+        let address = value().address.unwrap_or("".to_string()).to_string();
+
+        set_city(city);
+        set_country(country);
+        set_name(name);
+        set_address(address);
+    });
+
+    view! {
+        <div
+            class="flex items-center relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg \
+            hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 w-full \
+            appearance-none"
+            on:click=on_click
+        >
+            <div class="mr-3">
+                <label class="text-md text-neutral-200 block">
+                    {name}
+                </label>
+                <span class="text-xs text-neutral-400">
+                    <span>{city}</span>, <strong>{country}</strong>
+                </span>
+            </div>
+            <div class="grow text-right pr-4">
+                {address}
+            </div>
+            <button
+                type="button"
+                class="absolute inset-y-0 end-2 bg-transparent focus:outline-none p-0"
+            >
+                <Icon name="angle-right".to_string() />
+            </button>
+        </div>
+    }
+}
+
+#[component]
+pub fn Product<T>(value: ReadSignal<Product>, on_change: T) -> impl IntoView
+where
+    T: FnMut(leptos::ev::Event) + 'static,
+{
+    let (r#ref, set_ref) = create_signal("".to_string());
+    let (name, set_name) = create_signal("".to_string());
+    let (price, set_price) = create_signal(Money::default());
+
+    create_effect(move |_| {
+        let r#ref = value().r#ref.unwrap_or("".to_string()).to_string();
+        let name = value().name.unwrap_or("".to_string()).to_string();
+        let price = value().price.unwrap_or(Money {
+            currency: Some("".to_string()),
+            amount: Some(0),
+        });
+
+        set_ref(r#ref);
+        set_name(name);
+        set_price(price);
+    });
+
+    view! {
+        <>
+            <EntryRow
+                label="Ref".to_string()
+                value=r#ref
+                on_input=move |ev| set_ref(event_target_value(&ev))
+            />
+
+            <EntryRow
+                label="Name".to_string()
+                value=name
+                on_input=move |ev| set_name(event_target_value(&ev))
+            />
+
+            <MoneyActionRow
+                label="Price".to_string()
+                value=price
+                on_change=set_price
+            />
+        </>
+    }
+}
+
+#[component]
+pub fn MoneyActionRow<T>(label: String, value: ReadSignal<Money>, on_change: T) -> impl IntoView
+where
+    T: FnMut(Money) + 'static,
+{
+    let (amount, set_amount) = create_signal(0.0);
+    let (currency, set_currency) = create_signal("USD".to_string());
+
+    let options = UseIntlNumberFormatOptions::default()
+        .locale("co-CO")
+        .style(NumberStyle::Currency)
+        .currency("USD");
+
+    let number_format = use_intl_number_format(options);
+
+    let (formated_amount, set_formated_amount) = create_signal(number_format.format::<f64>(amount));
+
+    create_effect(move |_| {
+        let amount = value().amount.unwrap_or(0) as f64;
+        let currency = value().currency.unwrap_or("".to_string());
+
+        set_amount(amount);
+        set_currency(currency.clone());
+    });
+
+    create_effect(move |_| {
+        let options = UseIntlNumberFormatOptions::default()
+            .locale("co-CO")
+            .style(NumberStyle::Currency)
+            .maximum_significant_digits(3)
+            .currency(currency());
+
+        let number_format = use_intl_number_format(options);
+
+        set_formated_amount(number_format.format::<f64>(amount));
+    });
+
+    view! {
+        <div
+            class="flex items-center relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg \
+            hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 w-full \
+            appearance-none"
+        >
+            <div class="mr-3 py-3">
+                <label class="text-md text-neutral-200 block">
+                    {label}
+                </label>
+            </div>
+            <div class="grow text-right pr-4">
+                {formated_amount}
+            </div>
+            <button
+                type="button"
+                class="absolute inset-y-0 end-2 bg-transparent focus:outline-none p-0"
+            >
+                <Icon name="angle-right".to_string() />
+            </button>
+        </div>
     }
 }

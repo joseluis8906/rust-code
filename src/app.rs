@@ -4,8 +4,8 @@ use leptos_meta::*;
 use leptos_router::*;
 
 use crate::components::{
-    Button, CityActionRow, Desktop, Dialog, EntryRow, HeaderBar, ListBox, ListBoxRow, SearchEntry,
-    Window, WindowContent, WindowTitle,
+    Button, CityActionRow, Desktop, Dialog, EntryRow, HeaderBar, ListBox, ListBoxRow, Product,
+    SearchEntry, StoreActionRow, Window, WindowContent, WindowTitle,
 };
 
 use crate::types;
@@ -13,7 +13,7 @@ use crate::types;
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
         use crate::pb::delivery::storemanager::RegistersAStoreRequest;
-        use crate::pb::delivery::Store;
+        use crate::pb::delivery::{Store, Product, Money};
 
         use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
         use tonic::transport::Channel;
@@ -23,7 +23,7 @@ cfg_if::cfg_if! {
                 .ok_or_else(|| ServerFnError::ServerError("gRPC StoreManagerClient missing.".into()))
         }
     }else{
-        use crate::pb::delivery::Store;
+        use crate::pb::delivery::{Store, Product, Money};
     }
 }
 
@@ -52,7 +52,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Desktop>
                     <Routes>
-                        <Route path="" view=HomePage/>
+                        <Route path="/storemanager" view=StoreManagerPage/>
                     </Routes>
                 </Desktop>
             </main>
@@ -62,9 +62,10 @@ pub fn App() -> impl IntoView {
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage() -> impl IntoView {
+fn StoreManagerPage() -> impl IntoView {
     view! {
-        <ProductForm />
+        // <RegistersAStore />
+        <RegistersProducts />
     }
 }
 
@@ -88,7 +89,7 @@ pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
 }
 
 #[component]
-pub fn ProductForm() -> impl IntoView {
+pub fn RegistersAStore() -> impl IntoView {
     let (name, set_name) = create_signal("".to_string());
     let (city, set_city) = create_signal(types::CityCountry {
         city: "",
@@ -110,18 +111,14 @@ pub fn ProductForm() -> impl IntoView {
         <Window>
             <WindowTitle>Register a Store</WindowTitle>
             <WindowContent>
-                // <Img
-                //     src="https://img.freepik.com/free-vector/shop-with-sign-we-are-open_52683-38687.jpg?w=1380&t=st=1708213595~exp=1708214195~hmac=25f7a3f447093dff2aaa89ecf6237e3a659312d2204606ca597213c0c0271fb8"
-                //     alt="store"/>
-
                 <EntryRow
-                    label="Name"
+                    label="Name".to_string()
                     value=name
                     on_input=move |ev| set_name(event_target_value(&ev))
                 />
 
                 <Dialog show=show_dialog>
-                    <HeaderBar class="bg-osd" title="Select a City">
+                    <HeaderBar class="bg-osd".to_string() title="Select a City".to_string()>
                         <SearchEntry />
                     </HeaderBar>
                     <ListBox>
@@ -167,8 +164,8 @@ pub fn ProductForm() -> impl IntoView {
                 </Dialog>
 
                 <CityActionRow
-                    title="City"
-                    subtitle="Chose a city from list..."
+                    title="City".to_string()
+                    subtitle="Chose a city from list...".to_string()
                     value=city
                     on_click=move |_| {
                         set_show_dialog(true);
@@ -176,7 +173,7 @@ pub fn ProductForm() -> impl IntoView {
                 />
 
                 <EntryRow
-                    label="Address"
+                    label="Address".to_string()
                     value=address
                     on_input=move |ev| set_address(event_target_value(&ev))
                 />
@@ -217,6 +214,51 @@ pub fn ProductForm() -> impl IntoView {
 
             </WindowContent>
 
+        </Window>
+    }
+}
+
+#[component]
+pub fn RegistersProducts() -> impl IntoView {
+    let initialStore = Store {
+        name: Some("Burger King Cabecera".to_string()),
+        country: Some("Colombia".to_string()),
+        city: Some("Bucaramanga".to_string()),
+        address: Some("Cra 27 # 54 - 12".to_string()),
+        products: vec![],
+    };
+
+    let initialProduct = Product {
+        r#ref: Some("BK-001".to_string()),
+        name: Some("Whopper".to_string()),
+        price: Some(Money {
+            currency: Some("COP".to_string()),
+            amount: Some(10000),
+        }),
+    };
+
+    let (store, _set_store) = create_signal(initialStore);
+    let (product, _set_product) = create_signal(initialProduct);
+
+    view! {
+        <Window>
+            <WindowTitle>Register a Product</WindowTitle>
+            <WindowContent>
+                <StoreActionRow value=store on_click=move |_| {} />
+                <Product value=product on_change=move |_| {} />
+                <div class="flex justify-between">
+                    <Button
+                        label="Cancel"
+                        on_click=move |_| {}
+                    />
+
+                    <Button
+                        label="Save"
+                        primary=true
+                        on_click=move |_| {}
+                    />
+                </div>
+            </WindowContent>
         </Window>
     }
 }
