@@ -39,7 +39,7 @@ pub fn Label(children: Children) -> impl IntoView {
 
 #[component]
 pub fn Button<T>(
-    label: &'static str,
+    label: String,
     on_click: T,
     #[prop(default = false)] primary: bool,
 ) -> impl IntoView
@@ -822,6 +822,33 @@ where
             >
                 <Icon name="angle-right".to_string() />
             </button>
+        </div>
+    }
+}
+
+#[component]
+pub fn WindowAction<T, U>(
+    #[prop(default = "Cancel".to_string())] cancel_label: String,
+    #[prop(default = "Accept".to_string())] accept_label: String,
+    on_cancel: T,
+    on_accept: U,
+) -> impl IntoView
+where
+    T: FnMut(leptos::ev::MouseEvent) + 'static,
+    U: FnMut(leptos::ev::MouseEvent) + 'static,
+{
+    view! {
+        <div class="flex justify-between">
+            <Button
+                label=cancel_label
+                on_click=on_cancel
+            />
+
+            <Button
+                label=accept_label
+                primary=true
+                on_click=on_accept
+            />
         </div>
     }
 }

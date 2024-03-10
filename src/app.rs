@@ -5,7 +5,7 @@ use leptos_router::*;
 
 use crate::components::{
     Button, CityActionRow, Desktop, Dialog, EntryRow, HeaderBar, ListBox, ListBoxRow, Product,
-    SearchEntry, StoreActionRow, Window, WindowContent, WindowTitle,
+    SearchEntry, StoreActionRow, Window, WindowAction, WindowContent, WindowTitle,
 };
 
 use crate::types;
@@ -180,12 +180,12 @@ pub fn RegistersAStore() -> impl IntoView {
 
                 <div class="flex justify-between">
                     <Button
-                        label="Cancel"
+                        label="Cancel".to_string()
                         on_click=move |_| reset()
                 />
 
                     <Button
-                        label="Save"
+                        label="Save".to_string()
                         primary=true
                         on_click=move |_| {
                             let city = city();
@@ -246,18 +246,16 @@ pub fn RegistersProducts() -> impl IntoView {
             <WindowContent>
                 <StoreActionRow value=store on_click=move |_| {} />
                 <Product value=product on_change=move |_| {} />
-                <div class="flex justify-between">
-                    <Button
-                        label="Cancel"
-                        on_click=move |_| {}
-                    />
-
-                    <Button
-                        label="Save"
-                        primary=true
-                        on_click=move |_| {}
-                    />
-                </div>
+                <WindowAction
+                    accept_label="Save".to_string()
+                    on_accept=move |_| {
+                        logging::log!("product registered successfully!");
+                    }
+                    cancel_label="Cancel".to_string()
+                    on_cancel=move |_| {
+                        logging::log!("product registration canceled!");
+                    }
+                />
             </WindowContent>
         </Window>
     }
