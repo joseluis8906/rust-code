@@ -28,3 +28,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #3c3c3c;
 }
+
+.store-action-row, .money-action-row {
+  cursor: pointer !important;
+}

@@ -695,19 +695,19 @@ where
     view! {
         <div
             class="flex items-center relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg \
-            hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 w-full \
-            appearance-none"
+            hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-1.5 w-full \
+            appearance-none store-action-row"
             on:click=on_click
         >
             <div class="mr-3">
-                <label class="text-md text-neutral-200 block">
+                <label class="text-md text-neutral-200 block cursor-pointer">
                     {name}
                 </label>
-                <span class="text-xs text-neutral-400">
+                <div class="text-xs text-neutral-400">
                     <span>{city}</span>, <strong>{country}</strong>
-                </span>
+                </div>
             </div>
-            <div class="grow text-right pr-4">
+            <div class="grow text-right text-sm pr-4">
                 {address}
             </div>
             <button
@@ -806,14 +806,14 @@ where
         <div
             class="flex items-center relative bg-foreground text-neutral-200 placeholder-neutral-500 rounded-lg \
             hover:bg-hover active:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-300/50 px-3 py-0.5 w-full \
-            appearance-none"
+            appearance-none money-action-row"
         >
             <div class="mr-3 py-3">
                 <label class="text-md text-neutral-200 block">
                     {label}
                 </label>
             </div>
-            <div class="grow text-right pr-4">
+            <div class="grow text-right text-sm pr-4">
                 {formated_amount}
             </div>
             <button

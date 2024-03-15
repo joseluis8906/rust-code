@@ -64,8 +64,8 @@ pub fn App() -> impl IntoView {
 #[component]
 fn StoreManagerPage() -> impl IntoView {
     view! {
-        // <RegistersAStore />
-        <RegistersProducts />
+        <RegistersAStore />
+        // <RegistersProducts />
     }
 }
 
@@ -244,7 +244,7 @@ pub fn RegistersProducts() -> impl IntoView {
         <Window>
             <WindowTitle>Register a Product</WindowTitle>
             <WindowContent>
-                <StoreActionRow value=store on_click=move |_| {} />
+                <StoreActionRow value=store on_click=move |_| { logging::log!("it works") } />
                 <Product value=product on_change=move |_| {} />
                 <WindowAction
                     accept_label="Save".to_string()

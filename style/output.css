@@ -779,6 +779,10 @@ video {
   cursor: default;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .select-none {
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -1160,6 +1164,10 @@ video {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3c3c3c;
+}
+
+.store-action-row, .money-action-row {
+  cursor: pointer !important;
 }
 
 .last\:border-none:last-child {
