@@ -1,5 +1,5 @@
 #[cfg(feature = "ssr")]
-use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
+use crate::pb::delivery::storemanager::store_manager_service_client::StoreManagerServiceClient;
 
 #[cfg(feature = "ssr")]
 use axum::extract::FromRef;
@@ -18,6 +18,6 @@ use tonic::transport::Channel;
 
 pub struct AppState {
     pub leptos_options: LeptosOptions,
-    pub storemanager_grpc: StoreManagerClient<Channel>,
+    pub storemanager_grpc: StoreManagerServiceClient<Channel>,
     pub routes: Vec<RouteListing>,
 }

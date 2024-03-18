@@ -12,14 +12,14 @@ use crate::types;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
-        use crate::pb::delivery::storemanager::RegistersAStoreRequest;
+        use crate::pb::delivery::storemanager::AddStoreRequest;
         use crate::pb::delivery::{Store, Product, Money};
 
-        use crate::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
+        use crate::pb::delivery::storemanager::store_manager_service_client::StoreManagerServiceClient;
         use tonic::transport::Channel;
 
-        pub fn client() -> Result<StoreManagerClient<Channel>, ServerFnError> {
-            use_context::<StoreManagerClient<Channel>>()
+        pub fn client() -> Result<StoreManagerServiceClient<Channel>, ServerFnError> {
+            use_context::<StoreManagerServiceClient<Channel>>()
                 .ok_or_else(|| ServerFnError::ServerError("gRPC StoreManagerClient missing.".into()))
         }
     }else{
@@ -73,7 +73,7 @@ fn StoreManagerPage() -> impl IntoView {
 pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
     let mut client = client()?;
 
-    let req = RegistersAStoreRequest { store: Some(store) };
+    let req = AddStoreRequest { store: Some(store) };
 
     let mut request = tonic::Request::new(req);
 
@@ -81,7 +81,7 @@ pub async fn registers_a_store(store: Store) -> Result<(), ServerFnError> {
         .metadata_mut()
         .insert("x-auth-email", "john.doe@example.com".parse().unwrap());
 
-    let response = client.registers_a_store(request).await;
+    let response = client.add_store(request).await;
     match response {
         Ok(_) => Ok(()),
         Err(e) => Err(ServerFnError::ServerError(e.to_string())),

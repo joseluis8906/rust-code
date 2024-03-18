@@ -57,9 +57,9 @@ async fn main() {
 
     log::info!("running server with SSR");
 
-    use rust_code::pb::delivery::storemanager::store_manager_client::StoreManagerClient;
+    use rust_code::pb::delivery::storemanager::store_manager_service_client::StoreManagerServiceClient;
 
-    let client = StoreManagerClient::connect("http://[::1]:50051")
+    let client = StoreManagerServiceClient::connect("http://[::1]:50051")
         .await
         .unwrap();
 
