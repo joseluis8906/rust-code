@@ -1,0 +1,4 @@
+max_width = 120 
+tab_spaces = 8
+indentation_style = "Auto"
+macro_names = [ "leptos::view, view" ]
