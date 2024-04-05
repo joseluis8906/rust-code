@@ -10,6 +10,6 @@ IFS=' '
 len=${#strarr[@]}
 PKG="${strarr[len-1]}"
 
-bazel coverage "$1/src:lib_test"
-genhtml --no-branch-coverage -output genhtml "$(bazel info output_path)/k8-fastbuild/testlogs/$1/${PKG}_test/coverage.dat"
+bazel coverage "//$1_test"
+genhtml --no-branch-coverage -output genhtml "$(bazel info bazel-testlogs)/$1_test/coverage.dat"
 xdg-open $RUST_CODE/genhtml/index.html

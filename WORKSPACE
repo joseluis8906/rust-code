@@ -61,6 +61,7 @@ rules_rust_dependencies()
 rust_register_toolchains(
     edition = "2021",
     versions = [
+        # "1.76.0"
       "nightly/2024-02-04"
     ],
 )
@@ -84,6 +85,7 @@ crates_repository(
     #     ),
     # },
     rust_version = "nightly/2024-02-04",
+    # rust_version = "1.76.0",
 )
 
 load("@crates_index//:defs.bzl", "crate_repositories")

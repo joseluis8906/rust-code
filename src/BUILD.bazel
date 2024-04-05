@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "lib",
@@ -13,4 +13,14 @@ rust_binary(
 rust_library(
     name = "pb",
     srcs = ["pb.rs"],
+)
+
+rust_library(
+    name = "financial",
+    srcs = ["financial.rs"],
+)
+
+rust_test(
+    name = "financial_test",
+    crate = ":financial",
 )
