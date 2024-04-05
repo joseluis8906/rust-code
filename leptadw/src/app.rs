@@ -34,7 +34,7 @@ pub fn App() -> impl IntoView {
         provide_meta_context();
 
         view! {
-            <Stylesheet id="leptos" href="/pkg/playground.css"/>
+            <Stylesheet id="leptos" href="/pkg/leptadw.css"/>
 
             // sets the document title
             <Title text="Welcome to Leptos"/>
@@ -59,7 +59,7 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn StoreManagerPage() -> impl IntoView {
-        view! { <AddProduct/> }
+        view! { <TestNavigationSplitView/> }
 }
 
 #[server(AddStore)]
